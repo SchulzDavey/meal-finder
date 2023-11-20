@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "738009573337",
+    "project_id": "notify-test-flutter-project",
+    "storage_bucket": "notify-test-flutter-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738009573337:android:0f47cb0b4bc5dbbe6cdbc8",
+        "android_client_info": {
+          "package_name": "com.example.meal_finder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZDABwPgX7NR_snXjFtgPWlwym2U6BPmY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738009573337:android:aedb66492557527a6cdbc8",
+        "android_client_info": {
+          "package_name": "com.notify.notify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZDABwPgX7NR_snXjFtgPWlwym2U6BPmY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
