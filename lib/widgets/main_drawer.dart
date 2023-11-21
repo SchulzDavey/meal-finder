@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meal_finder/providers/auth_provider.dart';
 
-class MainDrawer extends StatelessWidget {
+class MainDrawer extends ConsumerWidget {
   const MainDrawer({
     super.key,
     required this.onSelectScreen,
@@ -10,7 +12,11 @@ class MainDrawer extends StatelessWidget {
   final void Function(String identifier) onSelectScreen;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider);
+
+    ref.read(authProvider.notifier).setUser();
+
     return Drawer(
       child: Column(
         children: [
@@ -46,6 +52,21 @@ class MainDrawer extends StatelessWidget {
               ],
             ),
           ),
+          ListTile(
+            leading: Icon(
+              Icons.verified_user_rounded,
+              size: 26,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            title: Text(
+              user?.username ?? '',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 24,
+                  ),
+            ),
+          ),
+          const SizedBox(height: 20),
           ListTile(
             leading: Icon(
               Icons.restaurant,

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,11 @@ class _AuthScreenState extends State<AuthScreen> {
   final _formkey = GlobalKey<FormState>();
 
   var _isLogin = true;
+  var _enteredUsername = '';
   var _enteredEmail = '';
   var _enteredPassword = '';
   File? _selectedImage;
+  var _isUploading = false;
 
   void _submit() async {
     final isValid = _formkey.currentState!.validate();
@@ -32,6 +35,10 @@ class _AuthScreenState extends State<AuthScreen> {
     _formkey.currentState!.save();
 
     try {
+      setState(() {
+        _isUploading = true;
+      });
+
       if (_isLogin) {
         final userCredentials = await _firebase.signInWithEmailAndPassword(
           email: _enteredEmail,
@@ -50,7 +57,15 @@ class _AuthScreenState extends State<AuthScreen> {
 
         await storageRef.putFile(_selectedImage!);
         final imageUrl = await storageRef.getDownloadURL();
-        print(imageUrl);
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredentials.user!.uid)
+            .set({
+          'username': _enteredUsername,
+          'email': _enteredEmail,
+          'image_url': imageUrl,
+        });
       }
     } on FirebaseAuthException catch (error) {
       if (mounted) {
@@ -62,6 +77,10 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
           ),
         );
+
+        setState(() {
+          _isUploading = false;
+        });
       }
     }
   }
@@ -101,6 +120,24 @@ class _AuthScreenState extends State<AuthScreen> {
                                 _selectedImage = pickedImage;
                               },
                             ),
+                          if (!_isLogin)
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                labelText: 'Username',
+                              ),
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              textCapitalization: TextCapitalization.none,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Please enter a username.';
+                                }
+                                return null;
+                              },
+                              onSaved: (value) {
+                                _enteredUsername = value!;
+                              },
+                            ),
                           TextFormField(
                             decoration: const InputDecoration(
                               labelText: 'Email Address',
@@ -136,24 +173,27 @@ class _AuthScreenState extends State<AuthScreen> {
                             },
                           ),
                           const SizedBox(height: 30),
-                          ElevatedButton(
-                            onPressed: _submit,
-                            style: ElevatedButton.styleFrom(
-                                foregroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .primaryContainer),
-                            child: Text(_isLogin ? "Login" : "Sign up"),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _isLogin = !_isLogin;
-                              });
-                            },
-                            child: Text(_isLogin
-                                ? "Create an account"
-                                : "I already have an account"),
-                          )
+                          if (_isUploading) const CircularProgressIndicator(),
+                          if (!_isUploading)
+                            ElevatedButton(
+                              onPressed: _submit,
+                              style: ElevatedButton.styleFrom(
+                                  foregroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer),
+                              child: Text(_isLogin ? "Login" : "Sign up"),
+                            ),
+                          if (!_isUploading)
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  _isLogin = !_isLogin;
+                                });
+                              },
+                              child: Text(_isLogin
+                                  ? "Create an account"
+                                  : "I already have an account"),
+                            )
                         ],
                       ),
                     ),
