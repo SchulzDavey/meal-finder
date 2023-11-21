@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -77,6 +78,23 @@ class MainDrawer extends StatelessWidget {
             ),
             onTap: () {
               onSelectScreen('filters');
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.exit_to_app,
+              size: 26,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            title: Text(
+              'Logout',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 24,
+                  ),
+            ),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
             },
           )
         ],
