@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:meal_finder/screens/auth.dart';
+import 'package:meal_finder/screens/splash_screen.dart';
 import 'package:meal_finder/screens/tabs.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -32,7 +34,20 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: theme,
-      home: const AuthScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snaphot) {
+          if (snaphot.connectionState == ConnectionState.waiting) {
+            return const SplashScreen();
+          }
+
+          if (snaphot.hasData) {
+            return const TabsScreen();
+          }
+
+          return const AuthScreen();
+        },
+      ),
     );
   }
 }
